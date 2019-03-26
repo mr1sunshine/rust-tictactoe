@@ -38,7 +38,6 @@ fn main() -> GameResult {
 
 struct MyGame {
     cell_states: Vec<Cell>,
-    game_result: game_logic::GameResult,
 }
 
 #[derive(PartialEq)]
@@ -53,7 +52,6 @@ impl MyGame {
         // will mount that directory so we can omit it in the path here.
         MyGame {
             cell_states: vec![Cell::Empty; (PLAY_FIELD_SIZE * PLAY_FIELD_SIZE) as usize],
-            game_result: game_logic::GameResult::NoWinner,
         }
     }
 
@@ -97,16 +95,8 @@ impl event::EventHandler for MyGame {
             let field_type = MyGame::get_field_type(x, y);
             if field_type == FieldType::PlayField {
                 let cell = MyGame::get_cell(x, y);
-                let cell_state = self.get_cell_state(cell.0, cell.1);
                 self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
-                // self.game_result = game_logic::get_game_result(&self.cell_states);
-                // println!("GameResult = {}", self.game_result);
-                // // TODO: add better checking
-                // if game_logic::is_game_finished(&self.cell_states) {
-                //     return;
-                // }
                 game_logic::make_best_move(&mut self.cell_states);
-                // self.game_result = game_logic::get_game_result(&self.cell_states);
             }
         }
     }
@@ -195,14 +185,11 @@ impl event::EventHandler for MyGame {
             }
         }
 
-        match &self.game_result {
-            game_logic::GameResult::NoWinner => {}
-            game_logic::GameResult::Winner {
-                winner_type: _,
-                elements,
-            } => {
-                let (point1_y, point1_x) = elements[0];
-                let (point2_y, point2_x) = elements[2];
+        let game_state = game_logic::get_game_state(&self.cell_states);
+        match game_state {
+            game_logic::GameState::GameWon { player: _, cells } => {
+                let (point1_y, point1_x) = (cells[0] / 3, cells[0] % 3);
+                let (point2_y, point2_x) = (cells[2] / 3, cells[2] % 3);
                 let red_color = graphics::Color::from_rgb_u32(0x00FF0000);
                 mb.line(
                     &[
@@ -219,6 +206,7 @@ impl event::EventHandler for MyGame {
                     red_color,
                 )?;
             }
+            _ => (),
         }
         // ggez::graphics::rectangle(_ctx, graphics::DrawMode::Fill, border_rect);
         let mbb = mb.build(_ctx)?;
