@@ -37,7 +37,7 @@ pub const SCREEN_SIZE: (f32, f32) = (960.0, 640.0);
 
 pub const SQUARE_SIZE: f32 = 150.0;
 
-pub const PLAY_FIELD_SIZE: u32 = 3;
+pub const PLAY_FIELD_SIZE: usize = 3;
 
 pub const PLAY_FIELD_POS: (f32, f32) = (
     SCREEN_SIZE.0 / 2.0 - SQUARE_SIZE * (PLAY_FIELD_SIZE as f32 / 2.0),

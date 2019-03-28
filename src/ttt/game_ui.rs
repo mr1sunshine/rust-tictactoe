@@ -1,5 +1,8 @@
 use ggez::{
-    event, event::MouseButton, graphics, graphics::DrawParam, nalgebra::Point2, Context, GameResult,
+    event::{self, MouseButton},
+    graphics::{self, DrawParam, MeshBuilder},
+    nalgebra::Point2,
+    Context, GameResult,
 };
 
 use super::game::{
@@ -9,8 +12,6 @@ use super::game_logic;
 
 impl event::EventHandler for Game {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        // Update code here...
-
         Ok(())
     }
 
@@ -30,11 +31,9 @@ impl event::EventHandler for Game {
     }
 
     fn draw(&mut self, _ctx: &mut Context) -> GameResult {
-        // println!("draw called!");
-        // Draw code here...
         graphics::clear(_ctx, graphics::Color::from_rgb_u32(0xB0B0B0));
 
-        let mb = &mut graphics::MeshBuilder::new();
+        let mb = &mut MeshBuilder::new();
         for i in 0..PLAY_FIELD_SIZE + 1 {
             mb.line(
                 &[
@@ -63,52 +62,9 @@ impl event::EventHandler for Game {
         }
         for i in 0..PLAY_FIELD_SIZE {
             for j in 0..PLAY_FIELD_SIZE {
-                let cell_state = self.get_cell_state(i as usize, j as usize);
+                let cell_state = self.get_cell_state(i, j);
                 if let Cell::Player(player) = cell_state {
-                    match player {
-                        Player::Player1 => {
-                            mb.circle(
-                                graphics::DrawMode::stroke(4.0),
-                                Point2::new(
-                                    PLAY_FIELD_POS.0 + (i as f32 + 0.5) * SQUARE_SIZE,
-                                    PLAY_FIELD_POS.1 + (j as f32 + 0.5) * SQUARE_SIZE,
-                                ),
-                                SQUARE_SIZE as f32 / 4.0,
-                                0.00001,
-                                graphics::BLACK,
-                            );
-                        }
-                        Player::Player2 => {
-                            mb.line(
-                                &[
-                                    Point2::new(
-                                        PLAY_FIELD_POS.0 + SQUARE_SIZE * (i as f32 + 0.25),
-                                        PLAY_FIELD_POS.1 + SQUARE_SIZE * (j as f32 + 0.25),
-                                    ),
-                                    Point2::new(
-                                        PLAY_FIELD_POS.0 + SQUARE_SIZE * (i as f32 + 0.75),
-                                        PLAY_FIELD_POS.1 + SQUARE_SIZE * (j as f32 + 0.75),
-                                    ),
-                                ],
-                                4.0,
-                                graphics::BLACK,
-                            )?;
-                            mb.line(
-                                &[
-                                    Point2::new(
-                                        PLAY_FIELD_POS.0 + SQUARE_SIZE * (i as f32 + 0.75),
-                                        PLAY_FIELD_POS.1 + SQUARE_SIZE * (j as f32 + 0.25),
-                                    ),
-                                    Point2::new(
-                                        PLAY_FIELD_POS.0 + SQUARE_SIZE * (i as f32 + 0.25),
-                                        PLAY_FIELD_POS.1 + SQUARE_SIZE * (j as f32 + 0.75),
-                                    ),
-                                ],
-                                4.0,
-                                graphics::BLACK,
-                            )?;
-                        }
-                    }
+                    <Self as GameUI>::draw_player(mb, player, i, j);
                 }
             }
         }
@@ -147,3 +103,58 @@ impl event::EventHandler for Game {
         Ok(())
     }
 }
+
+trait GameUI {
+    fn draw_player1(mb: &mut MeshBuilder, pos_x: usize, pos_y: usize) {
+        mb.circle(
+            graphics::DrawMode::stroke(4.0),
+            Point2::new(
+                PLAY_FIELD_POS.0 + (pos_x as f32 + 0.5) * SQUARE_SIZE,
+                PLAY_FIELD_POS.1 + (pos_y as f32 + 0.5) * SQUARE_SIZE,
+            ),
+            SQUARE_SIZE as f32 / 4.0,
+            0.00001,
+            graphics::BLACK,
+        );
+    }
+
+    fn draw_player2(mb: &mut MeshBuilder, pos_x: usize, pos_y: usize) {
+        let _ = mb.line(
+            &[
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * (pos_x as f32 + 0.25),
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * (pos_y as f32 + 0.25),
+                ),
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * (pos_x as f32 + 0.75),
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * (pos_y as f32 + 0.75),
+                ),
+            ],
+            4.0,
+            graphics::BLACK,
+        );
+        let _ = mb.line(
+            &[
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * (pos_x as f32 + 0.75),
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * (pos_y as f32 + 0.25),
+                ),
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * (pos_x as f32 + 0.25),
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * (pos_y as f32 + 0.75),
+                ),
+            ],
+            4.0,
+            graphics::BLACK,
+        );
+    }
+
+    fn draw_player(mb: &mut MeshBuilder, player: Player, pos_x: usize, pos_y: usize) {
+        match player {
+            Player::Player1 => Self::draw_player1(mb, pos_x, pos_y),
+            Player::Player2 => Self::draw_player2(mb, pos_x, pos_y),
+        }
+    }
+}
+
+impl GameUI for Game {}
