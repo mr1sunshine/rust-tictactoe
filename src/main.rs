@@ -40,9 +40,13 @@ impl event::EventHandler for Game {
         if button == MouseButton::Left {
             let field_type = Game::get_field_type(x, y);
             if field_type == FieldType::PlayField {
-                let cell = Game::get_cell(x, y);
-                self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
-                game_logic::make_best_move(self);
+                let cells = self.get_cells();
+                let game_state = Game::get_game_state(&cells);
+                if game_state == GameState::InProgress {
+                    let cell = Game::get_cell(x, y);
+                    self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
+                    game_logic::make_best_move(self);
+                }
             }
         }
     }

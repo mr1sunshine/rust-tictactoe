@@ -10,7 +10,7 @@ impl std::fmt::Display for Player {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum GameState {
     GameWon { player: Player, cells: Vec<usize> },
     Tie,
@@ -151,10 +151,13 @@ impl Game {
     }
 
     pub(crate) fn make_move(&mut self, cell_id: usize, player: Player) {
-        if cell_id < self.cell_states.len() {
-            self.cell_states[cell_id] = Cell::Player(player);
-        } else {
-            unreachable!();
+        let game_state = Game::get_game_state(&self.cell_states);
+        if game_state == GameState::InProgress {
+            if cell_id < self.cell_states.len() {
+                self.cell_states[cell_id] = Cell::Player(player);
+            } else {
+                unreachable!();
+            }
         }
     }
 }
