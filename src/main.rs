@@ -3,20 +3,13 @@ use ggez::graphics;
 use ggez::nalgebra::Point2;
 use ggez::{graphics::DrawParam, Context, GameResult};
 
-mod game_logic;
-use game_logic::Cell;
-use game_logic::Player;
+mod ttt;
 
-const SCREEN_SIZE: (f32, f32) = (960.0, 640.0);
-
-const SQUARE_SIZE: f32 = 150.0;
-
-const PLAY_FIELD_SIZE: u32 = 3;
-
-const PLAY_FIELD_POS: (f32, f32) = (
-    SCREEN_SIZE.0 / 2.0 - SQUARE_SIZE * (PLAY_FIELD_SIZE as f32 / 2.0),
-    SCREEN_SIZE.1 / 2.0 - SQUARE_SIZE * (PLAY_FIELD_SIZE as f32 / 2.0),
-);
+use ttt::game::{
+    Cell, FieldType, Game, GameState, Player, PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE,
+    SQUARE_SIZE,
+};
+use ttt::game_logic;
 
 fn main() -> GameResult {
     // Make a Context.
@@ -32,58 +25,11 @@ fn main() -> GameResult {
     // Create an instance of your event handler.
     // Usually, you should provide it with the Context object to
     // use when setting your game up.
-    let state = &mut MyGame::new();
+    let state = &mut Game::new();
     event::run(ctx, event_loop, state)
 }
 
-struct MyGame {
-    cell_states: Vec<Cell>,
-}
-
-#[derive(PartialEq)]
-enum FieldType {
-    PlayField,
-    OutField,
-}
-
-impl MyGame {
-    fn new() -> Self {
-        // The ttf file will be in your resources directory. Later, we
-        // will mount that directory so we can omit it in the path here.
-        MyGame {
-            cell_states: vec![Cell::Empty; (PLAY_FIELD_SIZE * PLAY_FIELD_SIZE) as usize],
-        }
-    }
-
-    fn get_field_type(x: f32, y: f32) -> FieldType {
-        if PLAY_FIELD_POS.0 < x
-            && x < PLAY_FIELD_POS.0 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32
-            && PLAY_FIELD_POS.1 < y
-            && y < PLAY_FIELD_POS.1 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32
-        {
-            return FieldType::PlayField;
-        }
-
-        FieldType::OutField
-    }
-
-    fn get_cell(x: f32, y: f32) -> (usize, usize) {
-        let cell_x = (x - PLAY_FIELD_POS.0) / SQUARE_SIZE;
-        let cell_y = (y - PLAY_FIELD_POS.1) / SQUARE_SIZE;
-
-        (cell_x as usize, cell_y as usize)
-    }
-
-    fn get_cell_state(&self, row: usize, column: usize) -> Cell {
-        self.cell_states[row + column * PLAY_FIELD_SIZE as usize]
-    }
-
-    fn set_cell_state(&mut self, row: usize, column: usize, cell_state: Cell) {
-        self.cell_states[row + column * PLAY_FIELD_SIZE as usize] = cell_state;
-    }
-}
-
-impl event::EventHandler for MyGame {
+impl event::EventHandler for Game {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
         // Update code here...
 
@@ -92,11 +38,11 @@ impl event::EventHandler for MyGame {
 
     fn mouse_button_up_event(&mut self, _ctx: &mut Context, button: MouseButton, x: f32, y: f32) {
         if button == MouseButton::Left {
-            let field_type = MyGame::get_field_type(x, y);
+            let field_type = Game::get_field_type(x, y);
             if field_type == FieldType::PlayField {
-                let cell = MyGame::get_cell(x, y);
+                let cell = Game::get_cell(x, y);
                 self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
-                game_logic::make_best_move(&mut self.cell_states);
+                game_logic::make_best_move(self);
             }
         }
     }
@@ -185,9 +131,10 @@ impl event::EventHandler for MyGame {
             }
         }
 
-        let game_state = game_logic::get_game_state(&self.cell_states);
+        let cells = self.get_cells();
+        let game_state = Game::get_game_state(&cells);
         match game_state {
-            game_logic::GameState::GameWon { player: _, cells } => {
+            GameState::GameWon { player: _, cells } => {
                 let (point1_y, point1_x) = (cells[0] / 3, cells[0] % 3);
                 let (point2_y, point2_x) = (cells[2] / 3, cells[2] % 3);
                 let red_color = graphics::Color::from_rgb_u32(0x00FF0000);
