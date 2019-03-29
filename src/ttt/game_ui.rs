@@ -34,32 +34,9 @@ impl event::EventHandler for Game {
         graphics::clear(_ctx, graphics::Color::from_rgb_u32(0xB0B0B0));
 
         let mb = &mut MeshBuilder::new();
-        for i in 0..PLAY_FIELD_SIZE + 1 {
-            mb.line(
-                &[
-                    Point2::new(PLAY_FIELD_POS.0 + SQUARE_SIZE * i as f32, PLAY_FIELD_POS.1),
-                    Point2::new(
-                        PLAY_FIELD_POS.0 + SQUARE_SIZE * i as f32,
-                        PLAY_FIELD_POS.1 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32,
-                    ),
-                ],
-                4.0,
-                graphics::BLACK,
-            )?;
-        }
-        for i in 0..PLAY_FIELD_SIZE + 1 {
-            mb.line(
-                &[
-                    Point2::new(PLAY_FIELD_POS.0, PLAY_FIELD_POS.1 + SQUARE_SIZE * i as f32),
-                    Point2::new(
-                        PLAY_FIELD_POS.0 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32,
-                        PLAY_FIELD_POS.1 + SQUARE_SIZE * i as f32,
-                    ),
-                ],
-                4.0,
-                graphics::BLACK,
-            )?;
-        }
+
+        <Self as GameUI>::draw_field(mb);
+
         for i in 0..PLAY_FIELD_SIZE {
             for j in 0..PLAY_FIELD_SIZE {
                 let cell_state = self.get_cell_state(i, j);
@@ -73,38 +50,71 @@ impl event::EventHandler for Game {
         let game_state = Game::get_game_state(&cells);
         match game_state {
             GameState::GameWon { player: _, cells } => {
-                let (point1_y, point1_x) = (cells[0] / 3, cells[0] % 3);
-                let (point2_y, point2_x) = (cells[2] / 3, cells[2] % 3);
-                let red_color = graphics::Color::from_rgb_u32(0x00FF0000);
-                mb.line(
-                    &[
-                        Point2::new(
-                            PLAY_FIELD_POS.0 + SQUARE_SIZE * point1_x as f32 + SQUARE_SIZE / 2.0,
-                            PLAY_FIELD_POS.1 + SQUARE_SIZE * point1_y as f32 + SQUARE_SIZE / 2.0,
-                        ),
-                        Point2::new(
-                            PLAY_FIELD_POS.0 + SQUARE_SIZE * point2_x as f32 + SQUARE_SIZE / 2.0,
-                            PLAY_FIELD_POS.1 + SQUARE_SIZE * point2_y as f32 + SQUARE_SIZE / 2.0,
-                        ),
-                    ],
-                    10.0,
-                    red_color,
-                )?;
+                <Self as GameUI>::draw_red_line(mb, cells[0], cells[2]);
             }
             _ => (),
         }
-        // ggez::graphics::rectangle(_ctx, graphics::DrawMode::Fill, border_rect);
+
         let mbb = mb.build(_ctx)?;
         ggez::graphics::draw(_ctx, &mbb, DrawParam::default())?;
 
         graphics::present(_ctx)?;
-        // We yield the current thread until the next update
+
         ggez::timer::yield_now();
         Ok(())
     }
 }
 
 trait GameUI {
+    fn draw_field(mb: &mut MeshBuilder) {
+        for i in 0..PLAY_FIELD_SIZE + 1 {
+            let _ = mb.line(
+                &[
+                    Point2::new(PLAY_FIELD_POS.0 + SQUARE_SIZE * i as f32, PLAY_FIELD_POS.1),
+                    Point2::new(
+                        PLAY_FIELD_POS.0 + SQUARE_SIZE * i as f32,
+                        PLAY_FIELD_POS.1 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32,
+                    ),
+                ],
+                4.0,
+                graphics::BLACK,
+            );
+        }
+        for i in 0..PLAY_FIELD_SIZE + 1 {
+            let _ = mb.line(
+                &[
+                    Point2::new(PLAY_FIELD_POS.0, PLAY_FIELD_POS.1 + SQUARE_SIZE * i as f32),
+                    Point2::new(
+                        PLAY_FIELD_POS.0 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32,
+                        PLAY_FIELD_POS.1 + SQUARE_SIZE * i as f32,
+                    ),
+                ],
+                4.0,
+                graphics::BLACK,
+            );
+        }
+    }
+
+    fn draw_red_line(mb: &mut MeshBuilder, index_first: usize, index_second: usize) {
+        let (point1_y, point1_x) = (index_first / 3, index_first % 3);
+        let (point2_y, point2_x) = (index_second / 3, index_second % 3);
+        let red_color = graphics::Color::from_rgb_u32(0x00FF0000);
+        let _ = mb.line(
+            &[
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * point1_x as f32 + SQUARE_SIZE / 2.0,
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * point1_y as f32 + SQUARE_SIZE / 2.0,
+                ),
+                Point2::new(
+                    PLAY_FIELD_POS.0 + SQUARE_SIZE * point2_x as f32 + SQUARE_SIZE / 2.0,
+                    PLAY_FIELD_POS.1 + SQUARE_SIZE * point2_y as f32 + SQUARE_SIZE / 2.0,
+                ),
+            ],
+            10.0,
+            red_color,
+        );
+    }
+
     fn draw_player1(mb: &mut MeshBuilder, pos_x: usize, pos_y: usize) {
         mb.circle(
             graphics::DrawMode::stroke(4.0),
