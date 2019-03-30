@@ -4,7 +4,7 @@ use ggez::{
     Context,
 };
 
-use super::game::{Player, PLAY_FIELD_POS, PLAY_FIELD_SIZE, SQUARE_SIZE};
+use super::game::{Player, PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE, SQUARE_SIZE};
 
 pub(crate) fn draw_field(mb: &mut MeshBuilder) {
     for i in 0..PLAY_FIELD_SIZE + 1 {
@@ -106,12 +106,12 @@ pub(crate) fn draw_player(mb: &mut MeshBuilder, player: Player, pos_x: usize, po
     }
 }
 
-pub(crate) fn draw_text(ctx: &mut Context) {
-    let fps_display = Text::new(format!("FPS: test"));
+pub(crate) fn draw_text(ctx: &mut Context, text: &str) {
+    let fps_display = Text::new(format!("Game: {}", text));
     // When drawing through these calls, `DrawParam` will work as they are documented.
     let _ = graphics::draw(
         ctx,
         &fps_display,
-        (Point2::new(200.0, 0.0), graphics::BLACK),
+        (Point2::new(0.0, SCREEN_SIZE.1 * 0.9), graphics::BLACK),
     );
 }

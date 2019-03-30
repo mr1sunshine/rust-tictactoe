@@ -48,14 +48,15 @@ impl event::EventHandler for Game {
 
         let cells = self.get_cells();
         let game_state = Game::get_game_state(&cells);
-        match game_state {
+        match &game_state {
             GameState::GameWon { player: _, cells } => {
                 draw_red_line(mb, cells[0], cells[2]);
             }
             _ => (),
         }
 
-        draw_text(_ctx);
+        let text = game_state_to_str(&game_state);
+        draw_text(_ctx, &text);
         let mbb = mb.build(_ctx)?;
         ggez::graphics::draw(_ctx, &mbb, DrawParam::default())?;
 
@@ -63,5 +64,16 @@ impl event::EventHandler for Game {
 
         ggez::timer::yield_now();
         Ok(())
+    }
+}
+
+fn game_state_to_str(game_state: &GameState) -> String {
+    match game_state {
+        GameState::Tie => String::from("Tie"),
+        GameState::InProgress => String::from("In progress"),
+        GameState::GameWon { player, .. } => match player {
+            Player::Player1 => String::from("Computer won"),
+            Player::Player2 => String::from("Player won"),
+        },
     }
 }
