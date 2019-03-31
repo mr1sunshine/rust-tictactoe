@@ -33,6 +33,7 @@ pub enum Cell {
 
 pub struct Game {
     cell_states: Vec<Cell>,
+    selected_cell: SelectedCell,
 }
 
 #[derive(PartialEq)]
@@ -41,12 +42,19 @@ pub enum FieldType {
     OutField,
 }
 
+#[derive(Clone)]
+pub enum SelectedCell {
+    NotSelected,
+    Selected { x: usize, y: usize },
+}
+
 impl Game {
     pub(crate) fn new() -> Self {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
         Game {
             cell_states: vec![Cell::Empty; PLAY_FIELD_SIZE * PLAY_FIELD_SIZE],
+            selected_cell: SelectedCell::NotSelected,
         }
     }
 
@@ -66,11 +74,23 @@ impl Game {
         FieldType::OutField
     }
 
+    pub(crate) fn get_selected_cell(&self) -> SelectedCell {
+        self.selected_cell.clone()
+    }
+
     pub(crate) fn get_cell(x: f32, y: f32) -> (usize, usize) {
         let cell_x = (x - PLAY_FIELD_POS.0) / SQUARE_SIZE;
         let cell_y = (y - PLAY_FIELD_POS.1) / SQUARE_SIZE;
 
         (cell_x as usize, cell_y as usize)
+    }
+
+    pub(crate) fn select_cell(&mut self, x: f32, y: f32) {
+        let (index_x, index_y) = Game::get_cell(x, y);
+        self.selected_cell = SelectedCell::Selected {
+            x: index_x,
+            y: index_y,
+        };
     }
 
     pub(crate) fn get_cell_state(&self, row: usize, column: usize) -> Cell {

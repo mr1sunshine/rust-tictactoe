@@ -6,7 +6,7 @@ use ggez::{
     Context, GameResult,
 };
 
-use super::game::{Cell, FieldType, Game, GameState, Player};
+use super::game::{Cell, FieldType, Game, GameState, Player, SelectedCell};
 
 use super::config::PLAY_FIELD_SIZE;
 use super::game_logic;
@@ -31,6 +31,13 @@ impl event::EventHandler for Game {
                     }
                 }
             }
+        }
+    }
+
+    fn mouse_motion_event(&mut self, _ctx: &mut Context, x: f32, y: f32, _dx: f32, _dy: f32) {
+        let field_type = Game::get_field_type(x, y);
+        if field_type == FieldType::PlayField {
+            self.select_cell(x, y);
         }
     }
 
@@ -69,6 +76,10 @@ impl event::EventHandler for Game {
                 draw_red_line(mb, cells[0], cells[2]);
             }
             _ => (),
+        }
+
+        if let SelectedCell::Selected { x, y } = self.get_selected_cell() {
+            draw_selected_cell(mb, x, y);
         }
 
         let text = game_state_to_str(&game_state);

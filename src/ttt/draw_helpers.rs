@@ -4,8 +4,8 @@ use ggez::{
     Context,
 };
 
-use super::game::{Player};
 use super::config::{PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE, SQUARE_SIZE};
+use super::game::Player;
 
 pub(crate) fn draw_field(mb: &mut MeshBuilder) {
     for i in 0..PLAY_FIELD_SIZE + 1 {
@@ -36,6 +36,67 @@ pub(crate) fn draw_field(mb: &mut MeshBuilder) {
     }
 }
 
+pub(crate) fn draw_selected_cell(mb: &mut MeshBuilder, index_x: usize, index_y: usize) {
+    let red_color = graphics::Color::from_rgb_u32(0x00FF0000);
+    let offset = 5.0;
+    let width = 5.0;
+    let _ = mb.line(
+        &[
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * index_x as f32 + offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * index_y as f32 + offset - 1.0,
+            ),
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * (index_x + 1) as f32 - offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * index_y as f32 + offset - 1.0,
+            ),
+        ],
+        width,
+        red_color,
+    );
+    let _ = mb.line(
+        &[
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * index_x as f32 + offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * (index_y + 1) as f32 - offset,
+            ),
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * (index_x + 1) as f32 - offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * (index_y + 1) as f32 - offset,
+            ),
+        ],
+        width,
+        red_color,
+    );
+    let _ = mb.line(
+        &[
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * index_x as f32 + offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * index_y as f32 + offset,
+            ),
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * index_x as f32 + offset,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * (index_y + 1) as f32 - offset,
+            ),
+        ],
+        width,
+        red_color,
+    );
+    let _ = mb.line(
+        &[
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * (index_x + 1) as f32 - offset + 1.0,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * index_y as f32 + offset,
+            ),
+            Point2::new(
+                PLAY_FIELD_POS.0 + SQUARE_SIZE * (index_x + 1) as f32 - offset + 1.0,
+                PLAY_FIELD_POS.1 + SQUARE_SIZE * (index_y + 1) as f32 - offset,
+            ),
+        ],
+        width,
+        red_color,
+    );
+}
 pub(crate) fn draw_red_line(mb: &mut MeshBuilder, index_first: usize, index_second: usize) {
     let (point1_y, point1_x) = (index_first / 3, index_first % 3);
     let (point2_y, point2_x) = (index_second / 3, index_second % 3);
