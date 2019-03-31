@@ -6,7 +6,7 @@ use ggez::{
     Context, GameResult,
 };
 
-use super::game::{Cell, FieldType, Game, GameState, Player, SelectedCell};
+use super::game::{Cell, ChangeSelected, FieldType, Game, GameState, Player, SelectedCell};
 
 use super::config::PLAY_FIELD_SIZE;
 use super::game_logic;
@@ -48,8 +48,22 @@ impl event::EventHandler for Game {
         _keymod: KeyMods,
         _repeat: bool,
     ) {
-        if keycode == KeyCode::R {
-            self.clear();
+        match keycode {
+            KeyCode::R => self.clear(),
+            KeyCode::Left => self.move_selected_cell(ChangeSelected::Left),
+            KeyCode::Right => self.move_selected_cell(ChangeSelected::Right),
+            KeyCode::Up => self.move_selected_cell(ChangeSelected::Up),
+            KeyCode::Down => self.move_selected_cell(ChangeSelected::Down),
+            KeyCode::Space => {
+                let game_state = self.get_state();
+                if game_state == GameState::InProgress {
+                    let success = self.make_move_on_selected_cell(Player::Player2);
+                    if success {
+                        game_logic::make_best_move(self);
+                    }
+                }
+            }
+            _ => (),
         }
     }
 

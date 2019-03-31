@@ -42,10 +42,17 @@ pub enum FieldType {
     OutField,
 }
 
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub enum SelectedCell {
     NotSelected,
     Selected { x: usize, y: usize },
+}
+
+pub enum ChangeSelected {
+    Left,
+    Up,
+    Right,
+    Down,
 }
 
 impl Game {
@@ -59,7 +66,9 @@ impl Game {
     }
 
     pub(crate) fn clear(&mut self) {
-        self.cell_states = vec![Cell::Empty; PLAY_FIELD_SIZE * PLAY_FIELD_SIZE];
+        *self = Game::new();
+        // self.cell_states = vec![Cell::Empty; PLAY_FIELD_SIZE * PLAY_FIELD_SIZE];
+        // self.S
     }
 
     pub(crate) fn get_field_type(x: f32, y: f32) -> FieldType {
@@ -76,6 +85,10 @@ impl Game {
 
     pub(crate) fn get_selected_cell(&self) -> SelectedCell {
         self.selected_cell.clone()
+    }
+
+    pub(crate) fn get_state(&self) -> GameState {
+        Game::get_game_state(&self.cell_states)
     }
 
     pub(crate) fn get_cell(x: f32, y: f32) -> (usize, usize) {
@@ -103,6 +116,43 @@ impl Game {
             return true;
         }
         false
+    }
+
+    pub(crate) fn move_selected_cell(&mut self, direction: ChangeSelected) {
+        if self.selected_cell == SelectedCell::NotSelected {
+            self.selected_cell = SelectedCell::Selected { x: 0, y: 0 };
+            return;
+        }
+        match direction {
+            ChangeSelected::Down => {
+                if let SelectedCell::Selected { x, y } = self.selected_cell {
+                    if y < PLAY_FIELD_SIZE - 1 {
+                        self.selected_cell = SelectedCell::Selected { x: x, y: y + 1 };
+                    }
+                }
+            }
+            ChangeSelected::Up => {
+                if let SelectedCell::Selected { x, y } = self.selected_cell {
+                    if y > 0 {
+                        self.selected_cell = SelectedCell::Selected { x: x, y: y - 1 };
+                    }
+                }
+            }
+            ChangeSelected::Right => {
+                if let SelectedCell::Selected { x, y } = self.selected_cell {
+                    if x < PLAY_FIELD_SIZE - 1 {
+                        self.selected_cell = SelectedCell::Selected { x: x + 1, y: y };
+                    }
+                }
+            }
+            ChangeSelected::Left => {
+                if let SelectedCell::Selected { x, y } = self.selected_cell {
+                    if x > 0 {
+                        self.selected_cell = SelectedCell::Selected { x: x - 1, y: y };
+                    }
+                }
+            }
+        }
     }
 
     pub(crate) fn get_game_state(cell_states: &[Cell]) -> GameState {
@@ -176,6 +226,22 @@ impl Game {
                 self.cell_states[cell_id] = Cell::Player(player);
             } else {
                 unreachable!();
+            }
+        }
+    }
+
+    pub(crate) fn make_move_on_selected_cell(&mut self, player: Player) -> bool {
+        match self.selected_cell {
+            SelectedCell::NotSelected => return false,
+            SelectedCell::Selected { x, y } => {
+                let index = x + PLAY_FIELD_SIZE * y;
+                match self.cell_states[index] {
+                    Cell::Empty => {
+                        self.cell_states[index] = Cell::Player(player);
+                        return true;
+                    }
+                    _ => return false,
+                }
             }
         }
     }
