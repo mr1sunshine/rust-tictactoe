@@ -1,3 +1,5 @@
+use super::config::{PLAY_FIELD_SIZE, SQUARE_SIZE, PLAY_FIELD_POS};
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Player {
     Player1,
@@ -33,17 +35,6 @@ pub struct Game {
     cell_states: Vec<Cell>,
 }
 
-pub const SCREEN_SIZE: (f32, f32) = (960.0, 640.0);
-
-pub const SQUARE_SIZE: f32 = 150.0;
-
-pub const PLAY_FIELD_SIZE: usize = 3;
-
-pub const PLAY_FIELD_POS: (f32, f32) = (
-    SCREEN_SIZE.0 / 2.0 - SQUARE_SIZE * (PLAY_FIELD_SIZE as f32 / 2.0),
-    SCREEN_SIZE.1 / 2.0 - SQUARE_SIZE * (PLAY_FIELD_SIZE as f32 / 2.0),
-);
-
 #[derive(PartialEq)]
 pub enum FieldType {
     PlayField,
@@ -55,12 +46,12 @@ impl Game {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
         Game {
-            cell_states: vec![Cell::Empty; (PLAY_FIELD_SIZE * PLAY_FIELD_SIZE) as usize],
+            cell_states: vec![Cell::Empty; PLAY_FIELD_SIZE * PLAY_FIELD_SIZE],
         }
     }
 
     pub(crate) fn clear(&mut self) {
-        self.cell_states = vec![Cell::Empty; (PLAY_FIELD_SIZE * PLAY_FIELD_SIZE) as usize];
+        self.cell_states = vec![Cell::Empty; PLAY_FIELD_SIZE * PLAY_FIELD_SIZE];
     }
 
     pub(crate) fn get_field_type(x: f32, y: f32) -> FieldType {

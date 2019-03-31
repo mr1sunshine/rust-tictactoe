@@ -4,7 +4,8 @@ use ggez::{
     Context,
 };
 
-use super::game::{Player, PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE, SQUARE_SIZE};
+use super::game::{Player};
+use super::config::{PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE, SQUARE_SIZE};
 
 pub(crate) fn draw_field(mb: &mut MeshBuilder) {
     for i in 0..PLAY_FIELD_SIZE + 1 {

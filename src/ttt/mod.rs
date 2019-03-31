@@ -1,4 +1,5 @@
-pub mod game;
-pub mod game_logic;
-pub mod game_ui;
+pub mod config;
 mod draw_helpers;
+pub mod game;
+mod game_logic;
+mod game_ui;

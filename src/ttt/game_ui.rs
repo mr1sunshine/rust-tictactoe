@@ -6,9 +6,10 @@ use ggez::{
     Context, GameResult,
 };
 
-use super::game::{Cell, FieldType, Game, GameState, Player, PLAY_FIELD_SIZE};
+use super::game::{Cell, FieldType, Game, GameState, Player};
 
 use super::game_logic;
+use super::config::PLAY_FIELD_SIZE;
 
 impl event::EventHandler for Game {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
