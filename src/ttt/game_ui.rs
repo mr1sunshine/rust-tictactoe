@@ -89,11 +89,12 @@ impl event::EventHandler for Game {
             GameState::GameWon { player: _, cells } => {
                 draw_red_line(mb, cells[0], cells[2]);
             }
+            GameState::InProgress => {
+                if let SelectedCell::Selected { x, y } = self.get_selected_cell() {
+                    draw_selected_cell(mb, x, y);
+                }
+            }
             _ => (),
-        }
-
-        if let SelectedCell::Selected { x, y } = self.get_selected_cell() {
-            draw_selected_cell(mb, x, y);
         }
 
         let text = game_state_to_str(&game_state);

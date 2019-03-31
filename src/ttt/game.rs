@@ -119,6 +119,10 @@ impl Game {
     }
 
     pub(crate) fn move_selected_cell(&mut self, direction: ChangeSelected) {
+        match self.get_state() {
+            GameState::GameWon { .. } => return,
+            _ => (),
+        }
         if self.selected_cell == SelectedCell::NotSelected {
             self.selected_cell = SelectedCell::Selected { x: 0, y: 0 };
             return;
