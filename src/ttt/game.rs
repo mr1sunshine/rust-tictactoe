@@ -59,6 +59,10 @@ impl Game {
         }
     }
 
+    pub(crate) fn clear(&mut self) {
+        self.cell_states = vec![Cell::Empty; (PLAY_FIELD_SIZE * PLAY_FIELD_SIZE) as usize];
+    }
+
     pub(crate) fn get_field_type(x: f32, y: f32) -> FieldType {
         if PLAY_FIELD_POS.0 < x
             && x < PLAY_FIELD_POS.0 + SQUARE_SIZE * PLAY_FIELD_SIZE as f32

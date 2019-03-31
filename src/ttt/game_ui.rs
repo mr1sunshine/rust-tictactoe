@@ -1,7 +1,7 @@
 use super::draw_helpers::*;
 
 use ggez::{
-    event::{self, MouseButton},
+    event::{self, KeyCode, KeyMods, MouseButton},
     graphics::{self, DrawParam, MeshBuilder},
     Context, GameResult,
 };
@@ -27,6 +27,18 @@ impl event::EventHandler for Game {
                     game_logic::make_best_move(self);
                 }
             }
+        }
+    }
+
+    fn key_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        keycode: KeyCode,
+        _keymod: KeyMods,
+        _repeat: bool,
+    ) {
+        if keycode == KeyCode::R {
+            self.clear();
         }
     }
 

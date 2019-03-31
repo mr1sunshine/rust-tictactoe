@@ -107,7 +107,7 @@ pub(crate) fn draw_player(mb: &mut MeshBuilder, player: Player, pos_x: usize, po
 }
 
 pub(crate) fn draw_text(ctx: &mut Context, text: &str) {
-    let fps_display = Text::new(format!("Game: {}", text));
+    let fps_display = Text::new(format!("Game: {}\nPress 'R' to restart", text));
     // When drawing through these calls, `DrawParam` will work as they are documented.
     let _ = graphics::draw(
         ctx,
