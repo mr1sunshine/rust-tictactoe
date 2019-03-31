@@ -1,4 +1,4 @@
-use super::config::{PLAY_FIELD_SIZE, SQUARE_SIZE, PLAY_FIELD_POS};
+use super::config::{PLAY_FIELD_POS, PLAY_FIELD_SIZE, SQUARE_SIZE};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Player {
@@ -77,8 +77,12 @@ impl Game {
         self.cell_states[row + column * PLAY_FIELD_SIZE as usize]
     }
 
-    pub(crate) fn set_cell_state(&mut self, row: usize, column: usize, cell_state: Cell) {
-        self.cell_states[row + column * PLAY_FIELD_SIZE as usize] = cell_state;
+    pub(crate) fn set_cell_state(&mut self, row: usize, column: usize, cell_state: Cell) -> bool {
+        if self.cell_states[row + column * PLAY_FIELD_SIZE as usize] == Cell::Empty {
+            self.cell_states[row + column * PLAY_FIELD_SIZE as usize] = cell_state;
+            return true;
+        }
+        false
     }
 
     pub(crate) fn get_game_state(cell_states: &[Cell]) -> GameState {

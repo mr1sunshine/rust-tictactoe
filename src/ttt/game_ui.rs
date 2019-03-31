@@ -8,8 +8,8 @@ use ggez::{
 
 use super::game::{Cell, FieldType, Game, GameState, Player};
 
-use super::game_logic;
 use super::config::PLAY_FIELD_SIZE;
+use super::game_logic;
 
 impl event::EventHandler for Game {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
@@ -24,8 +24,11 @@ impl event::EventHandler for Game {
                 let game_state = Game::get_game_state(&cells);
                 if game_state == GameState::InProgress {
                     let cell = Game::get_cell(x, y);
-                    self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
-                    game_logic::make_best_move(self);
+                    let success =
+                        self.set_cell_state(cell.0, cell.1, Cell::Player(Player::Player2));
+                    if success {
+                        game_logic::make_best_move(self);
+                    }
                 }
             }
         }
