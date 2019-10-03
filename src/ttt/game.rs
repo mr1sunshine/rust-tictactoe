@@ -119,9 +119,8 @@ impl Game {
     }
 
     pub(crate) fn move_selected_cell(&mut self, direction: ChangeSelected) {
-        match self.get_state() {
-            GameState::GameWon { .. } => return,
-            _ => (),
+        if let GameState::GameWon { .. } = self.get_state() {
+            return;
         }
         if self.selected_cell == SelectedCell::NotSelected {
             self.selected_cell = SelectedCell::Selected { x: 0, y: 0 };
@@ -131,28 +130,28 @@ impl Game {
             ChangeSelected::Down => {
                 if let SelectedCell::Selected { x, y } = self.selected_cell {
                     if y < PLAY_FIELD_SIZE - 1 {
-                        self.selected_cell = SelectedCell::Selected { x: x, y: y + 1 };
+                        self.selected_cell = SelectedCell::Selected { x, y: y + 1 };
                     }
                 }
             }
             ChangeSelected::Up => {
                 if let SelectedCell::Selected { x, y } = self.selected_cell {
                     if y > 0 {
-                        self.selected_cell = SelectedCell::Selected { x: x, y: y - 1 };
+                        self.selected_cell = SelectedCell::Selected { x, y: y - 1 };
                     }
                 }
             }
             ChangeSelected::Right => {
                 if let SelectedCell::Selected { x, y } = self.selected_cell {
                     if x < PLAY_FIELD_SIZE - 1 {
-                        self.selected_cell = SelectedCell::Selected { x: x + 1, y: y };
+                        self.selected_cell = SelectedCell::Selected { x: x + 1, y };
                     }
                 }
             }
             ChangeSelected::Left => {
                 if let SelectedCell::Selected { x, y } = self.selected_cell {
                     if x > 0 {
-                        self.selected_cell = SelectedCell::Selected { x: x - 1, y: y };
+                        self.selected_cell = SelectedCell::Selected { x: x - 1, y };
                     }
                 }
             }
@@ -167,7 +166,7 @@ impl Game {
             {
                 if let Cell::Player(player) = cell_states[i * 3] {
                     return GameState::GameWon {
-                        player: player,
+                        player,
                         cells: vec![i * 3, i * 3 + 1, i * 3 + 2],
                     };
                 }
@@ -180,7 +179,7 @@ impl Game {
             {
                 if let Cell::Player(player) = cell_states[i] {
                     return GameState::GameWon {
-                        player: player,
+                        player,
                         cells: vec![i, i + 3, i + 6],
                     };
                 }
@@ -192,7 +191,7 @@ impl Game {
         {
             if let Cell::Player(player) = cell_states[0] {
                 return GameState::GameWon {
-                    player: player,
+                    player,
                     cells: vec![0, 4, 8],
                 };
             }
@@ -204,14 +203,14 @@ impl Game {
         {
             if let Cell::Player(player) = cell_states[2] {
                 return GameState::GameWon {
-                    player: player,
+                    player,
                     cells: vec![2, 4, 6],
                 };
             }
         }
 
-        for i in 0..cell_states.len() {
-            if cell_states[i] == Cell::Empty {
+        for states in cell_states {
+            if *states == Cell::Empty {
                 return GameState::InProgress;
             }
         }
@@ -236,15 +235,15 @@ impl Game {
 
     pub(crate) fn make_move_on_selected_cell(&mut self, player: Player) -> bool {
         match self.selected_cell {
-            SelectedCell::NotSelected => return false,
+            SelectedCell::NotSelected => false,
             SelectedCell::Selected { x, y } => {
                 let index = x + PLAY_FIELD_SIZE * y;
                 match self.cell_states[index] {
                     Cell::Empty => {
                         self.cell_states[index] = Cell::Player(player);
-                        return true;
+                        true
                     }
-                    _ => return false,
+                    _ => false,
                 }
             }
         }

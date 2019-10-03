@@ -86,7 +86,7 @@ impl event::EventHandler for Game {
         let cells = self.get_cells();
         let game_state = Game::get_game_state(&cells);
         match &game_state {
-            GameState::GameWon { player: _, cells } => {
+            GameState::GameWon { cells, .. } => {
                 draw_red_line(mb, cells[0], cells[2]);
             }
             GameState::InProgress => {

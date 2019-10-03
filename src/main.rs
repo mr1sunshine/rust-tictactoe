@@ -4,9 +4,9 @@ use ggez::GameResult;
 
 mod ttt;
 
-use ttt::game::{Game};
+use ttt::game::Game;
 
-use ttt::config::{GAME_NAME, AUTHOR, SCREEN_SIZE};
+use ttt::config::{AUTHOR, GAME_NAME, SCREEN_SIZE};
 
 fn main() -> GameResult {
     // Make a Context.
