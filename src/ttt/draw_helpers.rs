@@ -8,7 +8,7 @@ use super::config::{PLAY_FIELD_POS, PLAY_FIELD_SIZE, SCREEN_SIZE, SQUARE_SIZE};
 use super::game::Player;
 
 pub(crate) fn draw_field(mb: &mut MeshBuilder) {
-    for i in 0..PLAY_FIELD_SIZE + 1 {
+    for i in 0..=PLAY_FIELD_SIZE {
         let _ = mb.line(
             &[
                 Point2::new(PLAY_FIELD_POS.0 + SQUARE_SIZE * i as f32, PLAY_FIELD_POS.1),
@@ -21,7 +21,7 @@ pub(crate) fn draw_field(mb: &mut MeshBuilder) {
             graphics::BLACK,
         );
     }
-    for i in 0..PLAY_FIELD_SIZE + 1 {
+    for i in 0..=PLAY_FIELD_SIZE {
         let _ = mb.line(
             &[
                 Point2::new(PLAY_FIELD_POS.0, PLAY_FIELD_POS.1 + SQUARE_SIZE * i as f32),
